@@ -73,7 +73,7 @@ public class TeacherRestController {
             return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
         }
 
-        dto.setId(id); // Ensure the ID from the path parameter is used
+        dto.setId(id);
 
         try {
             Teacher updatedTeacher = teacherService.updateTeacher(dto);
