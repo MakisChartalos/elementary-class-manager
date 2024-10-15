@@ -30,6 +30,7 @@ public class ClassGroupDAOImpl implements IClassGroupDAO {
     @Override
     public void deleteClassGroup(Long id) {
         ClassGroup classGroupToDelete = getEntityManager().find(ClassGroup.class, id);
+        getEntityManager().remove(classGroupToDelete);
     }
 
     @Override
@@ -48,11 +49,9 @@ public class ClassGroupDAOImpl implements IClassGroupDAO {
         ParameterExpression<Character> nameParam = builder.parameter(Character.class);
         ParameterExpression<Grade> gradeParam = builder.parameter(Grade.class); // Use Grade enum here
 
-        // Create predicates for the name and grade filters
         Predicate namePredicate = builder.equal(root.get("name"), nameParam);
         Predicate gradePredicate = builder.equal(root.get("grade"), gradeParam);
 
-        // Combine the predicates
         selectQuery.select(root).where(builder.and(namePredicate, gradePredicate));
 
         return getEntityManager()

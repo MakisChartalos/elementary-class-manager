@@ -64,12 +64,13 @@ public class TeacherDAOImpl implements ITeacherDAO {
         ParameterExpression<String> registrationNumberParam = builder.parameter(String.class);
         selectQuery.select(root).where(builder.equal(root.get("registrationNumber"), registrationNumberParam));
 
-        List<Teacher> result = getEntityManager()
+        return   getEntityManager()
                 .createQuery(selectQuery)
                 .setParameter(registrationNumberParam, registrationNumber)
-                .getResultList();
+                .getResultStream()
+                .findAny();
 
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+
     }
 
     private EntityManager getEntityManager() {

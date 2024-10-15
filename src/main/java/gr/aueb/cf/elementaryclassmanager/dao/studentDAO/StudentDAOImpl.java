@@ -30,6 +30,7 @@ public class StudentDAOImpl implements IStudentDAO {
     @Override
     public void deleteStudent(Long id) {
         Student studentToDelete = getEntityManager().find(Student.class, id);
+        getEntityManager().remove(studentToDelete);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class StudentDAOImpl implements IStudentDAO {
         Root<Student> root = selectQuery.from(Student.class);
 
         ParameterExpression<String> lastnameParam = builder.parameter(String.class);
-        selectQuery.select(root).where(builder.like(root.get("lastName"),lastName + "%"));
+        selectQuery.select(root).where(builder.like(root.get("lastName"),lastName));
         return getEntityManager()
                 .createQuery(selectQuery)
                 .setParameter(lastnameParam, lastName + "%")
@@ -71,8 +72,18 @@ public class StudentDAOImpl implements IStudentDAO {
 
     @Override
     public Optional<Student> getBySsn(String ssn) {
-        Student studentToReturn = getEntityManager().find(Student.class, ssn);
-        return Optional.ofNullable(studentToReturn);
+        CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Student> query = builder.createQuery(Student.class);
+        Root<Student> root = query.from(Student.class);
+
+        ParameterExpression<String> ssnParam = builder.parameter(String.class);
+        query.select(root).where(builder.equal(root.get("ssn"), ssnParam));
+
+        return getEntityManager()
+                .createQuery(query)
+                .setParameter(ssnParam, ssn)
+                .getResultStream()
+                .findAny();
     }
 
     @Override
@@ -95,7 +106,10 @@ public class StudentDAOImpl implements IStudentDAO {
         Predicate activePredicate = builder.isFalse(root.get("archived"));
         selectQuery.select(root).where(builder.and(idPredicate, activePredicate));
 
-        return getEntityManager().createQuery(selectQuery).getResultStream().findFirst();
+        return getEntityManager()
+                .createQuery(selectQuery)
+                .getResultStream()
+                .findAny();
     }
 
 
