@@ -4,6 +4,7 @@ import gr.aueb.cf.elementaryclassmanager.dao.classGroupDAO.IClassGroupDAO;
 import gr.aueb.cf.elementaryclassmanager.dao.studentDAO.IStudentDAO;
 import gr.aueb.cf.elementaryclassmanager.dao.teacherDAO.ITeacherDAO;
 import gr.aueb.cf.elementaryclassmanager.dto.classgroupDTO.ClassGroupInsertDTO;
+import gr.aueb.cf.elementaryclassmanager.dto.classgroupDTO.ClassGroupReadOnlyDTO;
 import gr.aueb.cf.elementaryclassmanager.dto.classgroupDTO.ClassGroupUpdateDTO;
 import gr.aueb.cf.elementaryclassmanager.dto.studentDTO.StudentReadOnlyDTO;
 import gr.aueb.cf.elementaryclassmanager.mapper.Mapper;
@@ -70,7 +71,7 @@ public class ClassGroupServiceImpl implements IClassGroupService {
      * @throws ClassGroupAlreadyExists if a ClassGroup with the same name and grade already exists.
      */
     @Override
-    public ClassGroup insertClassGroup(ClassGroupInsertDTO dto) throws ClassGroupAlreadyExists {
+    public ClassGroupReadOnlyDTO insertClassGroup(ClassGroupInsertDTO dto) throws ClassGroupAlreadyExists {
         ClassGroup classGroupToInsert;
 
         try {
@@ -92,7 +93,7 @@ public class ClassGroupServiceImpl implements IClassGroupService {
             JPAHelper.closeEntityManagerFactory();
         }
 
-        return classGroupToInsert;
+        return Mapper.mapToClassGroupReadOnlyDTO(classGroupToInsert);
     }
 
     /**
@@ -103,7 +104,7 @@ public class ClassGroupServiceImpl implements IClassGroupService {
      * @throws EntityNotFoundException if the ClassGroup with the specified ID does not exist.
      */
     @Override
-    public ClassGroup updateClassGroup(ClassGroupUpdateDTO dto) throws EntityNotFoundException {
+    public ClassGroupReadOnlyDTO updateClassGroup(ClassGroupUpdateDTO dto) throws EntityNotFoundException {
         ClassGroup classGroupToUpdate;
         ClassGroup updatedClassGroup;
 
@@ -124,7 +125,7 @@ public class ClassGroupServiceImpl implements IClassGroupService {
             JPAHelper.closeEntityManagerFactory();
         }
 
-        return updatedClassGroup;
+        return Mapper.mapToClassGroupReadOnlyDTO(updatedClassGroup);
     }
 
     /**
@@ -273,34 +274,24 @@ public class ClassGroupServiceImpl implements IClassGroupService {
     public void incrementGradeForClassGroup(Long classGroupId) throws EntityNotFoundException {
         try {
             JPAHelper.beginTransaction();
+
             ClassGroup classGroupToIncrement = classGroupDAO.getById(classGroupId)
                     .orElseThrow(() -> new EntityNotFoundException(ClassGroup.class, classGroupId));
 
             Optional<Grade> nextGradeOpt = getNextGradeIfNotFinal(classGroupToIncrement.getGrade());
+
             if (nextGradeOpt.isEmpty()) {
+                archiveStudentsAndDeleteClassGroup(classGroupToIncrement);
                 throw new GradeIncrementNotAllowedException();
             }
 
             Grade nextGrade = nextGradeOpt.get();
             classGroupToIncrement.setGrade(nextGrade);
-
-            if (nextGradeOpt.isEmpty()) {
-                classGroupToIncrement.getStudents().forEach(student -> {
-                    student.setArchived(true);
-                    studentDAO.updateStudent(student);
-                    log.info("Student with ID " + student.getId() + " has been archived.");
-                });
-            }
-
-            if (areAllStudentsArchived(classGroupToIncrement)) {
-                classGroupDAO.deleteClassGroup(classGroupId);
-                log.info("ClassGroup with ID " + classGroupId + " has been deleted because all students have graduated.");
-            } else {
-                classGroupDAO.updateClassGroup(classGroupToIncrement);
-                log.info("ClassGroup with ID " + classGroupId + " was incremented to grade " + nextGrade + ".");
-            }
+            classGroupDAO.updateClassGroup(classGroupToIncrement);
+            log.info("ClassGroup with ID " + classGroupId + " was incremented to grade " + nextGrade + ".");
 
             JPAHelper.commitTransaction();
+
         } catch (EntityNotFoundException | GradeIncrementNotAllowedException e) {
             JPAHelper.rollbackTransaction();
             log.error(e.getMessage());
@@ -309,6 +300,7 @@ public class ClassGroupServiceImpl implements IClassGroupService {
             JPAHelper.closeEntityManagerFactory();
         }
     }
+
 
     /**
      * Returns the next grade if the current grade is not the final one.
@@ -325,13 +317,21 @@ public class ClassGroupServiceImpl implements IClassGroupService {
         return Optional.of(grades[nextIndex]);
     }
 
+
+
     /**
-     * Checks if all students in the class group are archived.
+     * Archives all students in a ClassGroup and deletes the ClassGroup if all students are archived.
      *
-     * @param classGroup the class group to check.
-     * @return true if all students are archived, false otherwise.
+     * @param classGroup the ClassGroup whose students should be archived and potentially deleted.
      */
-    private boolean areAllStudentsArchived(ClassGroup classGroup) {
-        return classGroup.getStudents().stream().allMatch(Student::isArchived);
+    private void archiveStudentsAndDeleteClassGroup(ClassGroup classGroup) {
+        classGroup.getStudents().forEach(student -> {
+            student.setArchived(true);
+            studentDAO.updateStudent(student);
+            log.info("Student with ID " + student.getId() + " has been archived.");
+        });
+
+        classGroupDAO.deleteClassGroup(classGroup.getId());
+        log.info("ClassGroup with ID " + classGroup.getId() + " has been deleted because all students have graduated.");
     }
 }

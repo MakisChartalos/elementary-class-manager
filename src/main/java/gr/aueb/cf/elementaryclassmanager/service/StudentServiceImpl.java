@@ -33,7 +33,7 @@ public class StudentServiceImpl implements IStudentService {
      * @throws StudentAlreadyExists if a student with the same SSN already exists
      */
     @Override
-    public Student insertStudent(StudentInsertDTO dto) throws StudentAlreadyExists {
+    public StudentReadOnlyDTO insertStudent(StudentInsertDTO dto) throws StudentAlreadyExists {
         Student studentToInsert;
 
         try {
@@ -53,7 +53,7 @@ public class StudentServiceImpl implements IStudentService {
         } finally {
             JPAHelper.closeEntityManagerFactory();
         }
-        return studentToInsert;
+        return Mapper.mapToStudentReadOnlyDTO(studentToInsert);
     }
 
     /**
@@ -66,7 +66,7 @@ public class StudentServiceImpl implements IStudentService {
      * @throws EntityNotFoundException if the student with the specified ID does not exist.
      */
     @Override
-    public Student updateStudent(StudentUpdateDTO dto) throws EntityNotFoundException {
+    public StudentReadOnlyDTO updateStudent(StudentUpdateDTO dto) throws EntityNotFoundException {
         Student studentToUpdate;
         Student updatedStudent;
 
@@ -96,7 +96,7 @@ public class StudentServiceImpl implements IStudentService {
             JPAHelper.closeEntityManagerFactory();
         }
 
-        return updatedStudent;
+        return Mapper.mapToStudentReadOnlyDTO(studentToUpdate);
     }
 
     /**

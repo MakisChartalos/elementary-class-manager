@@ -3,8 +3,6 @@ package gr.aueb.cf.elementaryclassmanager.rest;
 import gr.aueb.cf.elementaryclassmanager.dto.teacherDTO.TeacherInsertDTO;
 import gr.aueb.cf.elementaryclassmanager.dto.teacherDTO.TeacherReadOnlyDTO;
 import gr.aueb.cf.elementaryclassmanager.dto.teacherDTO.TeacherUpdateDTO;
-import gr.aueb.cf.elementaryclassmanager.mapper.Mapper;
-import gr.aueb.cf.elementaryclassmanager.model.Teacher;
 import gr.aueb.cf.elementaryclassmanager.service.ITeacherService;
 import gr.aueb.cf.elementaryclassmanager.service.exceptions.EntityNotFoundException;
 import gr.aueb.cf.elementaryclassmanager.service.exceptions.TeacherAlreadyExists;
@@ -43,8 +41,7 @@ public class TeacherRestController {
         }
 
         try {
-            Teacher teacher = teacherService.insertTeacher(dto);
-            TeacherReadOnlyDTO readOnlyDTO = Mapper.mapToTeacherReadOnlyDTO(teacher);
+            TeacherReadOnlyDTO readOnlyDTO = teacherService.insertTeacher(dto);
             UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().path(Long.toString(readOnlyDTO.getId()));
             return Response.created(uriBuilder.build())
                     .entity(readOnlyDTO)
@@ -76,8 +73,7 @@ public class TeacherRestController {
         dto.setId(id);
 
         try {
-            Teacher updatedTeacher = teacherService.updateTeacher(dto);
-            TeacherReadOnlyDTO readOnlyDTO = Mapper.mapToTeacherReadOnlyDTO(updatedTeacher);
+            TeacherReadOnlyDTO readOnlyDTO = teacherService.updateTeacher(dto);
             return Response.ok(readOnlyDTO).build();
 
         } catch (EntityNotFoundException e) {

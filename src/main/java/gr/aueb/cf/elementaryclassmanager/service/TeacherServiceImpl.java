@@ -33,7 +33,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @throws TeacherAlreadyExists if a teacher with the same registration number already exists
      */
     @Override
-    public Teacher insertTeacher(TeacherInsertDTO dto) throws TeacherAlreadyExists {
+    public TeacherReadOnlyDTO insertTeacher(TeacherInsertDTO dto) throws TeacherAlreadyExists {
         Teacher teacherToInsert;
 
         try {
@@ -54,7 +54,7 @@ public class TeacherServiceImpl implements ITeacherService {
         } finally {
             JPAHelper.closeEntityManagerFactory();
         }
-        return teacherToInsert;
+        return Mapper.mapToTeacherReadOnlyDTO(teacherToInsert);
     }
 
     /**
@@ -65,7 +65,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @throws EntityNotFoundException if the teacher with the given ID does not exist
      */
     @Override
-    public Teacher updateTeacher(TeacherUpdateDTO dto) throws EntityNotFoundException {
+    public TeacherReadOnlyDTO updateTeacher(TeacherUpdateDTO dto) throws EntityNotFoundException {
         Teacher teacherToUpdate;
         Teacher updatedTeacher;
 
@@ -85,7 +85,7 @@ public class TeacherServiceImpl implements ITeacherService {
         } finally {
             JPAHelper.closeEntityManagerFactory();
         }
-        return updatedTeacher;
+        return Mapper.mapToTeacherReadOnlyDTO(updatedTeacher);
     }
 
     /**
