@@ -28,7 +28,7 @@ public class TeacherRestController {
      *
      * @param dto the data transfer object containing teacher details
      * @param uriInfo the URI information to build the location header for the created resource
-     * @return a Response indicating the outcome of the operation
+     * @return a Response containing the newly created teacher details or an error if the teacher already exists
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -55,12 +55,12 @@ public class TeacherRestController {
     /**
      * Updates an existing teacher.
      *
-     * @param id the ID of the teacher to update
+     * @param id  the ID of the teacher to update
      * @param dto the data transfer object containing updated teacher details
-     * @return a Response indicating the outcome of the operation
+     * @return a Response containing the updated teacher details or an error if the teacher is not found
      */
-    @PUT
     @Path("/{id}")
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateTeacher(@PathParam("id") Long id, TeacherUpdateDTO dto) {
@@ -74,7 +74,7 @@ public class TeacherRestController {
 
         try {
             TeacherReadOnlyDTO readOnlyDTO = teacherService.updateTeacher(dto);
-            return Response.ok(readOnlyDTO).build();
+            return Response.ok().entity(readOnlyDTO).build();
 
         } catch (EntityNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -85,15 +85,16 @@ public class TeacherRestController {
      * Deletes a teacher by ID.
      *
      * @param id the ID of the teacher to delete
-     * @return a Response indicating the outcome of the operation
+     * @return a Response containing the deleted teacher details or an error if the teacher is not found
      */
-    @DELETE
     @Path("/{id}")
-    @Produces(MediaType.TEXT_PLAIN)
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteTeacher(@PathParam("id") Long id) {
         try {
+            TeacherReadOnlyDTO readOnlyDTO = teacherService.getTeacherById(id);
             teacherService.deleteTeacher(id);
-            return Response.noContent().build();
+            return Response.ok().entity(readOnlyDTO).build();
 
         } catch (EntityNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -104,15 +105,15 @@ public class TeacherRestController {
      * Retrieves a teacher by ID.
      *
      * @param id the ID of the teacher to retrieve
-     * @return a Response containing the teacher details
+     * @return a Response containing the teacher details or an error if the teacher is not found
      */
-    @GET
     @Path("/{id}")
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeacherById(@PathParam("id") Long id) {
         try {
             TeacherReadOnlyDTO teacherDTO = teacherService.getTeacherById(id);
-            return Response.ok(teacherDTO).build();
+            return Response.ok().entity(teacherDTO).build();
 
         } catch (EntityNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -123,7 +124,7 @@ public class TeacherRestController {
      * Searches for teachers by their last name.
      *
      * @param lastname the last name of the teachers to search for
-     * @return a Response containing a list of teachers that match the last name
+     * @return a Response containing a list of teachers that match the last name or an error if no teachers are found
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -134,7 +135,7 @@ public class TeacherRestController {
 
         try {
             List<TeacherReadOnlyDTO> teachers = teacherService.getTeachersByLastname(lastname);
-            return Response.ok(teachers).build();
+            return Response.ok().entity(teachers).build();
 
         } catch (EntityNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
