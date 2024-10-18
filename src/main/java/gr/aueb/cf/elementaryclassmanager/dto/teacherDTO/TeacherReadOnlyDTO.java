@@ -31,11 +31,15 @@ public class TeacherReadOnlyDTO extends BaseDTO {
     @Email(message = "Email should be valid")
     private String email;
 
-    public TeacherReadOnlyDTO(Long id, String firstName, String lastname, String teacherRegistrationNumber, String email) {
+    @NotNull
+    private Long classGroupId;
+
+    public TeacherReadOnlyDTO(Long id, String firstName, String lastname, String teacherRegistrationNumber, String email, Long classGroupId) {
         this.setId(id);
-        this.setFirstname(firstName);
-        this.setLastname(lastname);
-        this.setRegistrationNumber(teacherRegistrationNumber);
-        this.setEmail(email);
+        this.firstname = firstName;
+        this.lastname = lastname;
+        this.registrationNumber = teacherRegistrationNumber;
+        this.email = email;
+        this.classGroupId = classGroupId;
     }
 }

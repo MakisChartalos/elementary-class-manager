@@ -15,11 +15,9 @@ import lombok.Setter;
 @Setter
 public class TeacherUpdateDTO extends BaseDTO {
 
-    @NotNull(message = "Firstname should not be null")
     @Size(min = 2, max = 255, message = "Error in firstname length")
     private String firstname;
 
-    @NotNull(message = "Lastname should  not null")
     @Size(min = 2, max = 255, message = "Error in lastname length")
     private String lastname;
 

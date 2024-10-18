@@ -17,6 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing Teachers.
+ * Provides methods to insert, update, delete, and retrieve teacher information.
+ */
 @Slf4j
 @Provider
 @ApplicationScoped
@@ -28,8 +32,10 @@ public class TeacherServiceImpl implements ITeacherService {
     /**
      * Inserts a new teacher into the system.
      *
+     * This method checks if a teacher with the given registration number already exists and inserts a new teacher if not.
+     *
      * @param dto the data transfer object containing teacher details
-     * @return the inserted teacher
+     * @return the inserted teacher as a read-only DTO
      * @throws TeacherAlreadyExists if a teacher with the same registration number already exists
      */
     @Override
@@ -61,7 +67,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * Updates an existing teacher in the system.
      *
      * @param dto the data transfer object containing updated teacher details
-     * @return the updated teacher
+     * @return the updated teacher as a read-only DTO
      * @throws EntityNotFoundException if the teacher with the given ID does not exist
      */
     @Override

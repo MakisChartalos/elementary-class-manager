@@ -15,6 +15,7 @@ public interface IClassGroupService {
     ClassGroupReadOnlyDTO insertClassGroup(ClassGroupInsertDTO dto) throws ClassGroupAlreadyExists;
     ClassGroupReadOnlyDTO updateClassGroup(ClassGroupUpdateDTO dto) throws EntityNotFoundException;
     void deleteClassGroup(Long id) throws EntityNotFoundException;
+    ClassGroupReadOnlyDTO getClassGroupById(Long id) throws EntityNotFoundException;
     List<StudentReadOnlyDTO> getStudentsByClassGroupId(Long classGroupId) throws EntityNotFoundException;
     void assignStudentToClassGroup(Long studentId, Long classGroupId) throws EntityNotFoundException, ClassGroupFullException, StudentGradeDoesNotMatchClassGroup;
     void assignTeacherToClassGroup(Long teacherId, Long classGroupId) throws EntityNotFoundException;

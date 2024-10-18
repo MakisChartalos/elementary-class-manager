@@ -63,12 +63,14 @@ public class Mapper {
      * @return a TeacherReadOnlyDTO containing the teacher's details
      */
     public static TeacherReadOnlyDTO mapToTeacherReadOnlyDTO(Teacher teacher) {
+        Long classGroupId = (teacher.getClassgroup() != null) ? teacher.getClassgroup().getId() : null;
         return new TeacherReadOnlyDTO(
                 teacher.getId(),
                 teacher.getFirstname(),
                 teacher.getLastname(),
                 teacher.getRegistrationNumber(),
-                teacher.getEmail()
+                teacher.getEmail(),
+                classGroupId
         );
     }
 
@@ -115,9 +117,13 @@ public class Mapper {
         Long classGroupId = (student.getClassGroup() != null) ? student.getClassGroup().getId() : null;
 
         // Create the DTO, passing the potentially null classGroupId
-        StudentReadOnlyDTO dto = new StudentReadOnlyDTO(student.getFirstname(), student.getLastname(), student.getSsn(), student.getGrade(), classGroupId);
+        StudentReadOnlyDTO dto = new StudentReadOnlyDTO(
+                student.getFirstname(),
+                student.getLastname(),
+                student.getSsn(),
+                student.getGrade(),
+                classGroupId);
 
-        // Set the student id
         dto.setId(student.getId());
 
         return dto;
@@ -158,6 +164,12 @@ public class Mapper {
      * @return a ClassGroupReadOnlyDTO containing the class group's details
      */
     public static ClassGroupReadOnlyDTO mapToClassGroupReadOnlyDTO(ClassGroup classGroup) {
-        return new ClassGroupReadOnlyDTO(classGroup.getName(), classGroup.getGrade());
+
+      return new ClassGroupReadOnlyDTO(
+              classGroup.getId(),
+              classGroup.getName(),
+              classGroup.getGrade()
+      );
+
     }
 }

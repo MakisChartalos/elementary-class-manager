@@ -14,10 +14,8 @@ import lombok.Setter;
 @Setter
 public class ClassGroupUpdateDTO extends BaseDTO {
 
-    @NotNull(message = "Name should not be null")
     private Character name;
 
-    @NotNull(message = "Grade should not be null")
     private Grade grade;
 
 }

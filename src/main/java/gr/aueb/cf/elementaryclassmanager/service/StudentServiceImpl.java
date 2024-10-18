@@ -17,6 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing Students.
+ * Provides methods to insert, update, delete, and retrieve student information.
+ */
 @Provider
 @ApplicationScoped
 @Slf4j
@@ -28,8 +32,10 @@ public class StudentServiceImpl implements IStudentService {
     /**
      * Inserts a new student into the system.
      *
-     * @param dto the data transfer object containing student details
-     * @return the inserted student
+     * This method checks if a student with the given SSN already exists and inserts a new student if not.
+     *
+     * @param dto the data transfer object containing student details (e.g., first name, last name, SSN, etc.)
+     * @return the inserted student as a read-only DTO
      * @throws StudentAlreadyExists if a student with the same SSN already exists
      */
     @Override
@@ -62,7 +68,7 @@ public class StudentServiceImpl implements IStudentService {
      * to ensure consistency. The grade change is then applied to the student.
      *
      * @param dto the data transfer object containing the updated student details.
-     * @return the updated Student entity.
+     * @return the updated student as a read-only DTO
      * @throws EntityNotFoundException if the student with the specified ID does not exist.
      */
     @Override

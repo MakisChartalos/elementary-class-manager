@@ -44,7 +44,7 @@ public class ValidatorUtil {
      * @return a list of error messages; empty list if there are no violations
      */
     public static <T> List<String> validateDTO(T dto) {
-        Set<ConstraintViolation<T>> violations = getValidator().validate(dto); // Use getValidator to ensure singleton
+        Set<ConstraintViolation<T>> violations = getValidator().validate(dto);
         List<String> errors = new ArrayList<>();
 
         if (!violations.isEmpty()) {
